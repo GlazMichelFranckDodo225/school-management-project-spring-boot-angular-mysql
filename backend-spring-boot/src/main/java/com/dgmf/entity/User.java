@@ -1,6 +1,6 @@
 package com.dgmf.entity;
 
-import com.dgmf.utils.enums.Role;
+import com.dgmf.entity.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,14 +8,45 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
-@Table(name = "tbl_user")
-public class User {
+@Table(
+        name = "tbl_user",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "username_unique", // Entity Attribute name
+                        columnNames = "username" // DB Column name
+                ),
+                @UniqueConstraint(
+                        name = "email_unique", // Entity Attribute name
+                        columnNames = "email" // DB Column name
+                )
+        }
+)
+/* When Spring Security starts, and set up the application, it
+uses a "userDetails" object which comes from the "UserDetails"
+Interface that contains bunch of Methods. To use these Methods,
+implementing "UserDetails" Interface is requested
+*/
+public class User implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "user_generator"
+    )
+    @SequenceGenerator(
+            name = "user_generator",
+            sequenceName = "user_sequence_name",
+            allocationSize = 1
+    )
     private Long id;
     @Column(name = "first_name", nullable = false, length = 20)
     private String firstName;
@@ -40,4 +71,31 @@ public class User {
     private LocalDateTime lastUpdated;
     @Enumerated(EnumType.STRING)
     private Role role;
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority((role.name())));
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }
