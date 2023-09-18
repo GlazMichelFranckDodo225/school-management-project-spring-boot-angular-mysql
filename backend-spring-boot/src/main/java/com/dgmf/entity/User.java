@@ -1,6 +1,6 @@
 package com.dgmf.entity;
 
-import com.dgmf.utils.enums.UserRole;
+import com.dgmf.utils.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,5 +39,5 @@ public class User {
     @UpdateTimestamp
     private LocalDateTime lastUpdated;
     @Enumerated(EnumType.STRING)
-    private UserRole userRole;
+    private Role role;
 }

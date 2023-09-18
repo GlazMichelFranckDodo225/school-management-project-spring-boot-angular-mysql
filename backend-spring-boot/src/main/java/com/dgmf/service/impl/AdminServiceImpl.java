@@ -3,10 +3,9 @@ package com.dgmf.service.impl;
 import com.dgmf.entity.User;
 import com.dgmf.repository.UserRepository;
 import com.dgmf.service.AdminService;
-import com.dgmf.utils.enums.UserRole;
+import com.dgmf.utils.enums.Role;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +21,7 @@ public class AdminServiceImpl implements AdminService {
         System.out.println("Stack Trace - AdminServiceImpl - " +
                 "@PostConstruct - createAdminAccount()");
 
-        User adminAccount = userRepository.findByUserRole(UserRole.ROLE_ADMIN);
+        User adminAccount = userRepository.findByRole(Role.ROLE_ADMIN);
 
         if(adminAccount == null) {
             User admin = User.builder()
@@ -31,7 +30,7 @@ public class AdminServiceImpl implements AdminService {
                     .username("johndoe")
                     .email("johndoe@gmail.com")
                     .password(passwordEncoder.encode("admin"))
-                    .userRole(UserRole.ROLE_ADMIN)
+                    .role(Role.ROLE_ADMIN)
                     .build();
 
             userRepository.save(admin);
