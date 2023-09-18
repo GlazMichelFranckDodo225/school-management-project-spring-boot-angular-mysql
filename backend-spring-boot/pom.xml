@@ -12,7 +12,7 @@
 	<artifactId>spring-boot-java-framework</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>spring-boot-java-framework</name>
-	<description>Spring Boot 3 - Spring Security 6 | JWT Authentication</description>
+	<description>School Management Project (Spring Boot 3 + Angular 16 + MySQL)</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
