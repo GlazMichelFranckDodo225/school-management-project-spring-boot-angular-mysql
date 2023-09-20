@@ -27,8 +27,9 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-    // This Method allows to create a "User", save him into the DB and
-    // returns, to the Client, the generated JWT Token related to him
+    // This Method allows to create a "User", save him into the DB
+    // and returns, to the Client, the generated JWT Token related
+    // to him
     @Override
     public AuthResponse register(
             RegisterRequestUserDTO registerRequestUserDTO)
@@ -68,39 +69,47 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequestUserDTO loginRequestUserDTO) {
-        // The "AuthenticationManager" will check "Username" and "Password"
-        // An Exception will throw if the "Username" or " Password"
+        // The "AuthenticationManager" will check "Username/Email"
+        // and "Password"
+        // An Exception will throw if the "Username/Email" or " Password"
         // are not correct
         authenticationManager.authenticate( /*
-                .authenticate() ==> Method of the "Authentication Manager"
-                which allows to authenticate "User" based on his
-                "Username" and "Password"
+                .authenticate() ==> Method of the
+                "Authentication Manager" which allows to authenticate
+                "User" based on his "Username/Email" and "Password"
                 */
                 new UsernamePasswordAuthenticationToken(
                         loginRequestUserDTO.getUsername(),
+                        // loginRequestUserDTO.getEmail(),
                         loginRequestUserDTO.getPassword()
                 )
         );
 
-        // Here, "Username" and "Password" are correct.
+        // Here, "Username/Email" and "Password" are correct.
         // Next step ==> Find the User into the DB based on
-        // his "Username" coming from the Request
+        // his "Username/Email" coming from the Request
         User userFound = userRepository
-                .findByUsername(loginRequestUserDTO.getUsername()).orElseThrow();
+                 .findByUsername(
+                         loginRequestUserDTO.getUsername()
+                 ).orElseThrow();
+                /*.findByUsername(loginRequestUserDTO
+                        .getEmail()).orElseThrow();*/
+                /*.findByEmail(loginRequestUserDTO
+                        .getEmail()).orElseThrow();*/
 
         // Generates a JWT Token for the retrieved User
         String jwtTokenUserFound = jwtService.getToken(userFound);
 
-        // Revocation of all existing Tokens of the logged-in User before
-        // saving the last one
+        // Revocation of all existing Tokens of the logged-in
+        // User before saving the last one
         revokeAllUserTokens(userFound);
 
         // Saves the "Token" of the connected User
         savedUserToken(userFound, jwtTokenUserFound);
 
-        System.out.println("Stack Trace - AuthServiceImpl - login() \nReturns " +
-                "the \"Token\" of the connected User to the " +
-                "Client : " + jwtTokenUserFound);
+        System.out.println("Stack Trace - AuthServiceImpl - " +
+                "login() Returns the Token of the connected " +
+                "User to the Client : " + jwtTokenUserFound);
 
         // Returns the JWT Token to the Client
         return AuthResponse.builder()
@@ -109,7 +118,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Token savedUserToken(User savedUser, String jwtTokenSavedUser) {
+    public Token savedUserToken(
+            User savedUser, String jwtTokenSavedUser) {
         // Saves or Persists the generated Token into the DB
         Token savedUserToken = Token.builder()
                 .user(savedUser)
@@ -128,7 +138,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void revokeAllUserTokens(User user) {
         Long userId = user.getId();
-        var validUserTokens = tokenRepository.findAllValidTokensByUser(userId);
+        var validUserTokens = tokenRepository
+                .findAllValidTokensByUser(userId);
 
         if(validUserTokens.isEmpty()) return;
 

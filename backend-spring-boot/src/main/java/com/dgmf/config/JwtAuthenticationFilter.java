@@ -60,7 +60,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // next Filter
             filterChain.doFilter(request, response);
 
-            System.out.println("Stack Trace - JwtAuthenticationFilter - doFilterInternal() \n'jwtToken == null'");
+            System.out.println("Stack Trace - JwtAuthenticationFilter - " +
+                    "doFilterInternal() 'jwtToken == null'");
 
             return;
         }
@@ -88,7 +89,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .loadUserByUsername(username);
 
             // Checking if the JWT Token is not expired or revoked inside the DB
-            var isTokenValidIntoTheDB = tokenRepository.findByToken(jwtToken)
+            var isTokenValidIntoTheDB = tokenRepository
+                    .findByToken(jwtToken)
                     .map(token -> !token.isExpired() && !token.isRevoked())
                     .orElse(false);
 
@@ -120,7 +122,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // considered authenticated
                 SecurityContextHolder.getContext().setAuthentication(authToken);
 
-                System.out.println("Stack Trace - JwtAuthenticationFilter - doFilterInternal() \n'username != null' && 'getAuthentication() == null' && 'Token is Valid'");
+                System.out.println("Stack Trace - JwtAuthenticationFilter " +
+                        "- doFilterInternal() 'username != null' && " +
+                        "'getAuthentication() == null' && 'Token is Valid'");
             }
         }
 
@@ -133,18 +137,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // 2.
     private String getTokenFromRequest(HttpServletRequest request) {
         // Retrieval of the "Authorization" Header
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        final String authHeader = request
+                .getHeader(HttpHeaders.AUTHORIZATION);
 
         // Checking if the "Authorization" Header contains the
         // "Bearer Token" (JWT Token)
         if(StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
-            System.out.println("Stack Trace - JwtAuthenticationFilter - getTokenFromRequest() \nReturns a 'Bearer Token' (JWT Token)");
+            System.out.println("Stack Trace - JwtAuthenticationFilter " +
+                    "- getTokenFromRequest() Returns a 'Bearer Token' " +
+                    "(JWT Token)");
 
             // If yes, returns "Bearer Token"
             return authHeader.substring(7);
         }
 
-        System.out.println("Stack Trace - JwtAuthenticationFilter - getTokenFromRequest()\n'Bearer Token' (JWT Token) == 'null'");
+        System.out.println("Stack Trace - JwtAuthenticationFilter " +
+                "- getTokenFromRequest() 'Bearer Token' (JWT Token) == " +
+                "'null'");
 
         // Return "null" if the "Bearer Token" is missing in
         // the "Authorization" Header

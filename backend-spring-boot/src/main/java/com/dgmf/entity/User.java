@@ -60,6 +60,7 @@ public class User implements UserDetails {
     @Column(name = "email", nullable = false, length = 50)
     private String email;
     private String password;
+    @Builder.Default
     private boolean isActive = true;
     @Column(name = "date_created", nullable = false)
     // Hibernate will automatically take the current Timestamp of the JVM

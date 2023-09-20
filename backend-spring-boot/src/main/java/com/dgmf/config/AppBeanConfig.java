@@ -18,13 +18,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 // "Beans" declared inside
 @Configuration
 @RequiredArgsConstructor
-public class AppConfig {
+public class AppBeanConfig {
     private final UserRepository userRepository; // B
 
     // Bean of Type "UserDetailsService"
     @Bean
     public UserDetailsService userDetailsService() { // A
-        System.out.println("Stack Trace - AppConfig - 'Bean' userDetailsService()");
+        System.out.println("Stack Trace - AppBeanConfig - " +
+                "'Bean' userDetailsService()");
 
         return username -> userRepository
                 .findByUsername(username)
@@ -36,8 +37,9 @@ public class AppConfig {
     // Bean of Type "PasswordEncoder"
     @Bean
     public PasswordEncoder passwordEncoder() { // D
-        System.out.println("Stack Trace - AppConfig - 'Bean' passwordEncoder()");
-
+        System.out.println("Stack Trace - AppBeanConfig - " +
+                "'Bean' passwordEncoder()");
+                
         return new BCryptPasswordEncoder();
     }
 
@@ -51,12 +53,13 @@ public class AppConfig {
 
         // Which User Details Service to use in order to fetch User
         // Information (there are multiple implementations of "UserDetailsService")
-        // ==> Takes the one just above
+        // ==> Takes the one just below
         authenticationProvider.setUserDetailsService(userDetailsService());
         // Which Password Encoder to use ==> Takes the one just below
         authenticationProvider.setPasswordEncoder(passwordEncoder());
 
-        System.out.println("Stack Trace - AppConfig - 'Bean' authenticationProvider()");
+        System.out.println("Stack Trace - AppBeanConfig - " +
+                "'Bean' authenticationProvider()");
 
         return authenticationProvider;
     }
@@ -69,7 +72,8 @@ public class AppConfig {
     public AuthenticationManager authenticationManager( // E
             AuthenticationConfiguration configuration) throws Exception
         {
-        System.out.println("Stack Trace - AppConfig - 'Bean' authenticationManager()");
+        System.out.println("Stack Trace - AppBeanConfig - " +
+                "'Bean' authenticationManager()");
 
         return configuration.getAuthenticationManager();
     }
